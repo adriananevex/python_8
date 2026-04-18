@@ -14,10 +14,8 @@ if __name__ == "__main__":
         print("Safe to install packages without affecting the global system.")
 
         print("\nPackage installation path:")
-        if hasattr(site, "getsitepackages"):
-            print(site.getsitepackages()[0])
-        else:
-            print(site.getusersitepackages())
+        for path in site.getsitepackages():
+            print(path)
     else:
         print("\nMATRIX STATUS: You're still plugged in\n")
 
@@ -29,7 +27,7 @@ if __name__ == "__main__":
 
         print("\nTo enter the construct, run:")
         print("python -m venv matrix_env")
-        print("source matrix_env/bin/activate # on Unix")
+        print("source matrix_env/bin/activate # On Unix")
         print("matrix_env\\Scripts\\activate # On Windows")
 
         print("\nThen run this program again.")

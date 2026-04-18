@@ -1,5 +1,14 @@
 import sys
 import importlib
+from importlib import metadata
+import os
+
+
+def get_version(package):
+    try:
+        return metadata.version(package)
+    except metadata.PackageNotFoundError:
+        return "unknown"
 
 
 def check_dependencies(packages):
@@ -7,14 +16,14 @@ def check_dependencies(packages):
     missing = []
 
     print("\nLOADING STATUS: Loading programs...\n")
-    print("Checking dependencies:")
+    print("Checking dependencies:\n")
 
     for package in packages:
         try:
             module = importlib.import_module(package)
             modules[package] = module
 
-            version = getattr(module, "__version__", "unknown")
+            version = get_version(package)
 
             if package == "pandas":
                 print(f"[OK] pandas ({version}) - Data manipulation ready")
@@ -32,17 +41,54 @@ def check_dependencies(packages):
     return modules, missing
 
 
+def show_pip_vs_poetry():
+    print("\n=== PIP vs POETRY DIFFERENCES ===\n")
+
+    print(" PIP (traditional way):")
+    print("- Installs packages manually")
+    print("- Uses requirements.txt")
+    print("- No project management")
+    print("- You manage virtual environments manually (venv)")
+    print("- Install command: pip install -r requirements.txt")
+    print("- Run: python loading.py\n")
+
+    print(" POETRY (modern way):")
+    print("- Manages dependencies + project together")
+    print("- Uses pyproject.toml")
+    print("- Automatically creates virtual environments")
+    print("- Handles dependency resolution better")
+    print("- Install command: poetry install")
+    print("- Run: poetry run python loading.py\n")
+
+
+def show_versions(modules):
+    print("\nInstalled package versions:\n")
+
+    for name in modules:
+        version = get_version(name)
+        print(f"- {name}: {version}")
+
+
 def main():
     packages = ["pandas", "numpy", "matplotlib", "requests"]
+
     modules, missing = check_dependencies(packages)
 
     if missing:
-        print("\nMissing dependencies detected.")
+        print("\nMissing dependencies detected.\n")
+
         print("Install with pip:")
         print("pip install -r requirements.txt")
-        print("\nOr with Poetry:")
+        print("python3 loading.py")
+
+        print("\nInstall with Poetry:")
         print("poetry install")
+        print("poetry run python loading.py")
+
         sys.exit(1)
+
+    show_pip_vs_poetry()
+    show_versions(modules)
 
     print("\nAnalyzing Matrix data...")
 
@@ -59,8 +105,10 @@ def main():
     print("Generating visualization...")
 
     plt.figure()
-    plt.plot(df["signal"])
-    plt.plot(df["rolling_mean"])
+    plt.plot(df["signal"], label="signal")
+    plt.plot(df["rolling_mean"], label="rolling mean")
+    plt.legend()
+
     plt.savefig("matrix_analysis.png")
 
     print("\nAnalysis complete!")
