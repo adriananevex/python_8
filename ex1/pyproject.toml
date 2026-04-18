@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "matrix-loading"
+version = "0.1.0"
+description = "Matrix data analysis tool using numpy, pandas and matplotlib"
+authors = ["aneves <aneves@student.42lisboa.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pandas = "^2.0"
+numpy = "^1.25"
+matplotlib = "^3.7"
+requests = "^2.31"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

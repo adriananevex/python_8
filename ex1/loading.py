@@ -2,44 +2,70 @@ import sys
 import importlib
 
 
-if __name__ == "__main__":
-    packages = ["pandas", "numpy", "matplotlib", "requests"]
+def check_dependencies(packages):
     modules = {}
+    missing = []
 
     print("\nLOADING STATUS: Loading programs...\n")
-
     print("Checking dependencies:")
+
     for package in packages:
         try:
             module = importlib.import_module(package)
             modules[package] = module
-            if module.__name__ == "pandas":
-                print(f"[OK] {module.__name__} ({module.__version__}) \
-                      - Data manipulation ready")
-            elif module.__name__ == "requests":
-                print(f"[OK] {module.__name__} ({module.__version__}) \
-                      - Network access ready")
-            elif module.__name__ == "matplotlib":
-                print(f"[OK] {module.__name__} ({module.__version__}) \
-                      - Visualization ready")
+
+            version = getattr(module, "__version__", "unknown")
+
+            if package == "pandas":
+                print(f"[OK] pandas ({version}) - Data manipulation ready")
+            elif package == "numpy":
+                print(f"[OK] numpy ({version}) - Numerical computation ready")
+            elif package == "matplotlib":
+                print(f"[OK] matplotlib ({version}) - Visualization ready")
+            elif package == "requests":
+                print(f"[OK] requests ({version}) - Network access ready")
+
         except ImportError:
             print(f"[MISSING] {package} - Not installed")
+            missing.append(package)
+
+    return modules, missing
+
+
+def main():
+    packages = ["pandas", "numpy", "matplotlib", "requests"]
+    modules, missing = check_dependencies(packages)
+
+    if missing:
+        print("\nMissing dependencies detected.")
+        print("Install with pip:")
+        print("pip install -r requirements.txt")
+        print("\nOr with Poetry:")
+        print("poetry install")
+        sys.exit(1)
 
     print("\nAnalyzing Matrix data...")
 
-    data = modules["numpy"].random.normal(0, 1, 1000)
-    df = modules["pandas"].DataFrame({"signal": data})
-    df["rolling_mean"] = df["signal"].rolling(window=20).mean()
-
+    np = modules["numpy"]
+    pd = modules["pandas"]
     plt = importlib.import_module("matplotlib.pyplot")
 
-    plt.plot(df["signal"])
-    plt.plot(df["rolling_mean"])
+    data = np.random.normal(0, 1, 1000)
 
-    plt.savefig(f"{sys.prefix}/matrix_analysis.png")
+    df = pd.DataFrame({"signal": data})
+    df["rolling_mean"] = df["signal"].rolling(window=20).mean()
 
     print(f"Processing {len(df)} data points...")
     print("Generating visualization...")
 
+    plt.figure()
+    plt.plot(df["signal"])
+    plt.plot(df["rolling_mean"])
+    plt.savefig("matrix_analysis.png")
+
     print("\nAnalysis complete!")
     print("Results saved to: matrix_analysis.png")
+
+
+if __name__ == "__main__":
+    main()
