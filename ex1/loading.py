@@ -1,7 +1,6 @@
 import sys
 import importlib
 from importlib import metadata
-import os
 
 
 def get_version(package):
